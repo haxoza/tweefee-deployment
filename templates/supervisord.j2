@@ -1,0 +1,11 @@
+[program:tweefee]
+command=/opt/tweefee/venv/bin/python /opt/tweefee/repo/tweefee/tweefee.py --logging={{ tweefee.logging }} --history_size={{ tweefee.history_size }} --port={{ tweefee.port }}
+priority=1
+autorestart=true
+autostart=true
+
+[program:listener]
+command=/opt/tweefee/venv/bin/python /opt/tweefee/repo/tweefee/listener.py --api_key {{ listener.api_key }} --api_secret {{ listener.api_secret }} --access_token {{ listener.access_token }} --access_token_secret {{ listener.access_token_secret }} --hash_tags "{{ listener.hash_tags }}" --logging {{ listener.logging }} --consumer_url={{ listener.consumer_url }}
+priority=2
+autorestart=true
+autostart=true

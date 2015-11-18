@@ -1,0 +1,45 @@
+- hosts: app
+  remote_user: root
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: install server requirements
+      apt: name={{ item }} update_cache=yes
+      with_items:
+        - git
+        - python
+        - python3
+        - python-virtualenv
+        - python3.4-venv
+        - python-pip
+        - python3-pip
+        - python-dev
+        - python3-dev
+        - supervisor
+    - name: set up authorized_keys for the root user
+      authorized_key: user=root key="{{ item }}"
+      with_items:
+        - https://github.com/haxoza.keys
+    - name: create project structure
+      file: path=/opt/tweefee state=directory
+    - name: configure supervisor for tweefee
+      action: template src=templates/supervisord.j2 dest=/etc/supervisor/conf.d/tweefee.conf
+      notify:
+        - restart supervisor
+    - name: start supervisor on system startup
+      service: name=supervisor enabled=yes
+    - name: fetch and udpate repository
+      git: repo="{{ repository }}" dest=/opt/tweefee/repo version="{{ branch }}" accept_hostkey=yes
+      notify:
+        - restart tweefee
+    - name: install application requirements
+      pip: requirements=/opt/tweefee/repo/requirements.txt virtualenv=/opt/tweefee/venv virtualenv_command="/usr/bin/python3 -m venv"
+      notify:
+        - restart tweefee
+    - name: start supervisor
+      service: name=supervisor state=started
+  handlers:
+    - name: restart supervisor
+      service: name=supervisor state=restarted
+    - name: restart tweefee
+      supervisorctl: name=tweefee state=restarted

@@ -1,0 +1,14 @@
+repository: https://github.com/haxoza/tweefee.git
+branch: master
+listener:
+  api_key: <api_key>
+  api_secret: <api_secret>
+  access_token: <access_token>
+  access_token_secret: <access_token_secret>
+  hash_tags: "#selfie"
+  logging: error
+  consumer_url: http://localhost/api
+tweefee:
+  history_size: 50
+  logging: error
+  port: 80
